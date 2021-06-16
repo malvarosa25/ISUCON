@@ -40,7 +40,10 @@ class App < Sinatra::Base
     end
 
     def current_user
-      db.xquery('SELECT * FROM `users` WHERE `id` = ? LIMIT 1', session[:user_id]).first
+      # db.xquery('SELECT * FROM `users` WHERE `id` = ? LIMIT 1', session[:user_id]).first
+      return @current_user if defined?(@current_user)
+
+      @current_user = db.xquery('SELECT * FROM `users` WHERE `id` = ? LIMIT 1', session[:user_id]).first
     end
 
     def get_reservations(schedule)
@@ -53,8 +56,9 @@ class App < Sinatra::Base
     end
 
     def get_reservations_count(schedule)
-      reservations = db.xquery('SELECT * FROM `reservations` WHERE `schedule_id` = ?', schedule[:id])
-      schedule[:reserved] = reservations.size
+      # reservations = db.xquery('SELECT * FROM `reservations` WHERE `schedule_id` = ?', schedule[:id])
+      # schedule[:reserved] = reservations.size
+      schedule[:reserved] = db.xquery('SELECT COUNT(id) as cnt FROM `reservations` WHERE `schedule_id` = ?', schedule[:id]).first[:cnt]
     end
 
     def get_user(id)
